@@ -1,0 +1,34 @@
+gpio_devices:
+- id: sample_digital_in_gpio_0
+  name: Sample digital input switch
+  type: Digital in
+  enabled: true
+  properties:
+    pin: gpio 0
+    pull_resistance: pull_up
+    debounce_interval: 100
+
+- id: sample_digital_out_gpio_2
+  name: Sample on/off relay control
+  type: digital out
+  enabled: true
+  properties:
+    pin: gpio 2
+
+
+internal_devices:
+- id: cpu_temperature
+  enabled: true
+  properties:
+    cron: 0 0/2 * * * ?
+
+- id: cpu_voltage
+  enabled: true
+  properties:
+    cron: 0 0/5 * * * ?
+
+- id: system_memory
+  enabled: true
+  properties:
+    cron: 0 0/5 * * * ?
+    unit: MB
