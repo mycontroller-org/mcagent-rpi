@@ -23,6 +23,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.mycontroller.agent.rpi.AgentProperties;
 import org.mycontroller.standalone.AppProperties.NETWORK_TYPE;
 import org.mycontroller.standalone.message.RawMessage;
 import org.mycontroller.standalone.message.RawMessageQueue;
@@ -106,6 +107,7 @@ public class RpiMqttCallbackListener implements MqttCallback {
             } else {
                 try {
                     mqttClient.connect(connectOptions);
+                    mqttClient.subscribe(AgentProperties.getInstance().getRpiMqttProperties().getTopicSubscribe());
                     _logger.info("MQTT client[{}] Reconnected successfully...", mqttClient.getServerURI());
                     if (mqttClient.isConnected()) {
                         break;
