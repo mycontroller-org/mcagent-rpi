@@ -32,3 +32,8 @@ internal_devices:
   properties:
     cron: 0 0/5 * * * ?
     unit: MB
+
+- id: system_cpu_usage
+  enabled: true
+  properties:
+    cron: 0/30 * * * * ?

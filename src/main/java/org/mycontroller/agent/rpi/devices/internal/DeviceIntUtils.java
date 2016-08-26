@@ -35,6 +35,8 @@ import lombok.NoArgsConstructor;
 public class DeviceIntUtils {
     public static final String KEY_CPU_TEMPERATURE = "cpu_temperature";
     public static final String KEY_CPU_TEMPERATURE_NAME = "CPU temperature";
+    public static final String KEY_SYSTEM_CPU_USAGE = "system_cpu_usage";
+    public static final String KEY_SYSTEM_CPU_USAGE_NAME = "System cpu usage";
     public static final String KEY_CPU_VOLTAGE = "cpu_voltage";
     public static final String KEY_CPU_VOLTAGE_NAME = "CPU voltage";
     public static final String KEY_SYSTEM_MEMORY = "system_memory";
@@ -46,6 +48,7 @@ public class DeviceIntUtils {
         CLASSES_MAP.put(KEY_CPU_TEMPERATURE, CpuTemperature.class.getName());
         CLASSES_MAP.put(KEY_CPU_VOLTAGE, CpuVoltage.class.getName());
         CLASSES_MAP.put(KEY_SYSTEM_MEMORY, SystemMemory.class.getName());
+        CLASSES_MAP.put(KEY_SYSTEM_CPU_USAGE, CpuUsage.class.getName());
     }
 
     public static McpRawMessage getPresentationMessage(String sensorId) {

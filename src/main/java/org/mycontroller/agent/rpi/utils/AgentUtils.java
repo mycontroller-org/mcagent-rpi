@@ -184,12 +184,14 @@ public class AgentUtils {
     public static void processReceivedMessage(RawMessage rawMessage) throws RawMessageException {
         McpRawMessage message = new McpRawMessage(rawMessage);
         IDeviceConf deviceConf = getDeviceConf(message.getSensorId());
-        if (deviceConf == null) {
+        if (deviceConf == null
+                && (message.getMessageType() == MESSAGE_TYPE.C_SET || message.getMessageType() == MESSAGE_TYPE.C_REQ)) {
             _logger.warn("Message received for unknown device '{}', {}", message.getSensorId(), message);
             return;
         }
         switch (message.getMessageType()) {
             case C_INTERNAL:
+                processInternal(message);
                 break;
             case C_PRESENTATION:
                 processPresentation(message);
@@ -209,11 +211,13 @@ public class AgentUtils {
     private static void processSetType(McpRawMessage message, IDeviceConf deviceConf) {
         switch (deviceConf.getType()) {
             case DIGITAL_IN:
+                //Nothing to do
                 break;
             case DIGITAL_OUT:
                 DigitalOutput.setState((DigitalOutputConf) deviceConf, McUtils.getBoolean(message.getPayload()));
                 break;
             default:
+                _logger.warn("Not supported type:{}, {}", message, deviceConf);
                 break;
 
         }
@@ -235,70 +239,50 @@ public class AgentUtils {
         RawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
-    private static void processPresentation(McpRawMessage message) {
+    private static void processInternal(McpRawMessage message) {
         switch (MESSAGE_TYPE_INTERNAL.valueOf(message.getSubType())) {
             case I_BATTERY_LEVEL:
                 break;
-            case I_CHILDREN:
-                break;
-            case I_CONFIG:
-                break;
             case I_DEBUG:
                 break;
-            case I_DISCOVER:
-                break;
-            case I_DISCOVER_RESPONSE:
-                break;
-            case I_FIND_PARENT:
-                break;
-            case I_FIND_PARENT_RESPONSE:
-                break;
-            case I_GATEWAY_READY:
-                break;
-            case I_GET_NONCE:
-                break;
-            case I_GET_NONCE_RESPONSE:
-                break;
             case I_HEARTBEAT:
-                break;
-            case I_HEARTBEAT_RESPONSE:
-                break;
-            case I_ID_REQUEST:
+                genericResponse(message, MESSAGE_TYPE_INTERNAL.I_HEARTBEAT_RESPONSE.getText());
                 break;
             case I_ID_RESPONSE:
-                break;
-            case I_INCLUSION_MODE:
-                break;
-            case I_LOCKED:
                 break;
             case I_LOG_MESSAGE:
                 break;
             case I_PING:
+                genericResponse(message, MESSAGE_TYPE_INTERNAL.I_PONG.getText());
                 break;
-            case I_PONG:
-                break;
+            case I_DISCOVER:
             case I_PRESENTATION:
                 sendDeviceDetais();
                 break;
             case I_REBOOT:
                 break;
-            case I_REGISTRATION_REQUEST:
-                break;
-            case I_REGISTRATION_RESPONSE:
-                break;
-            case I_REQUEST_SIGNING:
-                break;
-            case I_SKETCH_NAME:
-                break;
-            case I_SKETCH_VERSION:
-                break;
             case I_TIME:
                 break;
-            case I_VERSION:
-                break;
             default:
+                _logger.warn("Not supported type:{}", message);
                 break;
         }
+    }
+
+    private static void processPresentation(McpRawMessage message) {
+        switch (MESSAGE_TYPE_PRESENTATION.valueOf(message.getSubType())) {
+            default:
+                //Nothing to do.
+                break;
+        }
+    }
+
+    private static void genericResponse(McpRawMessage message, String subType) {
+        message.setTxMessage(true);
+        message.setTopicsPublish(AgentProperties.getInstance().getRpiMqttProperties().getTopicPublish());
+        message.setPayload(String.valueOf(System.currentTimeMillis()));
+        message.setSubType(subType);
+        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     private static void sendNodeInformation() {
