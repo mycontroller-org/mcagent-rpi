@@ -17,6 +17,7 @@
 package org.mycontroller.agent.rpi.model;
 
 import org.mycontroller.agent.rpi.utils.AgentUtils.DEVICE_TYPE;
+import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
 
 /**
@@ -33,5 +34,7 @@ public interface IDeviceConf {
     void sendSensorTypes();
 
     McpRawMessage getMcpRawMessage();
+
+    McpRawMessage getMcpRawMessage(MESSAGE_TYPE_SET_REQ setReqType);
 
 }

@@ -17,7 +17,7 @@
 package org.mycontroller.agent.rpi.devices.listener;
 
 import org.mycontroller.agent.rpi.model.DigitalInputConf;
-import org.mycontroller.standalone.message.RawMessageQueue;
+import org.mycontroller.agent.rpi.mqtt.AgentRawMessageQueue;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
 
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
@@ -42,7 +42,7 @@ public class DigitalInputPinListener implements GpioPinListenerDigital {
         _logger.debug("Pin state:{}, ", stateEvent.getState().getValue(), conf);
         //Send to message queue
         McpRawMessage message = conf.getMcpRawMessage();
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
 }

@@ -22,11 +22,11 @@ import org.knowm.sundial.Job;
 import org.knowm.sundial.JobContext;
 import org.knowm.sundial.exceptions.JobInterruptException;
 import org.mycontroller.agent.rpi.model.DeviceInternal;
+import org.mycontroller.agent.rpi.mqtt.AgentRawMessageQueue;
 import org.mycontroller.agent.rpi.utils.AgentUtils;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_PRESENTATION;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
-import org.mycontroller.standalone.message.RawMessageQueue;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
 import org.mycontroller.standalone.utils.McUtils;
 
@@ -42,8 +42,8 @@ import lombok.extern.slf4j.Slf4j;
 public class SystemMemory extends Job implements IDeviceInternal {
     public static final String KEY_UNIT = "unit";
 
-    public static final String USED = MESSAGE_TYPE_SET_REQ.V_VAR1.name();
-    public static final String FREE = MESSAGE_TYPE_SET_REQ.V_VAR2.name();
+    public static final String USED = MESSAGE_TYPE_SET_REQ.V_USED.name();
+    public static final String FREE = MESSAGE_TYPE_SET_REQ.V_FREE.name();
     public static final String USED_PERCENTAGE = MESSAGE_TYPE_SET_REQ.V_PERCENTAGE.name();
 
     private Double divider = null;
@@ -66,17 +66,17 @@ public class SystemMemory extends Job implements IDeviceInternal {
         McpRawMessage message = getMcpRawMessage();
         message.setSubType(USED);
         message.setPayload(getUsed());
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
 
         //Send Free
         message.setSubType(FREE);
         message.setPayload(getFree());
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
 
         //Send used percentage
         message.setSubType(USED_PERCENTAGE);
         message.setPayload(getUsedPercentage());
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     private String getUsedPercentage() {
@@ -108,15 +108,15 @@ public class SystemMemory extends Job implements IDeviceInternal {
 
     @Override
     public void aboutMe() {
-        McpRawMessage message = DeviceIntUtils.getPresentationMessage(DeviceIntUtils.KEY_SYSTEM_MEMORY);
-        message.setSubType(MESSAGE_TYPE_PRESENTATION.S_CUSTOM.name());
-        message.setPayload(DeviceIntUtils.KEY_SYSTEM_MEMORY_NAME);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        McpRawMessage message = DeviceIntUtils.getPresentationMessage(DeviceIntUtils.KEY_MEMORY_USAGE);
+        message.setSubType(MESSAGE_TYPE_PRESENTATION.S_MEMORY.name());
+        message.setPayload(DeviceIntUtils.KEY_MEMORY_USAGE_NAME);
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     @Override
     public McpRawMessage getMcpRawMessage() {
-        McpRawMessage message = DeviceIntUtils.getPayloadMessage(DeviceIntUtils.KEY_SYSTEM_MEMORY);
+        McpRawMessage message = DeviceIntUtils.getPayloadMessage(DeviceIntUtils.KEY_MEMORY_USAGE);
         return message;
     }
 
@@ -126,15 +126,15 @@ public class SystemMemory extends Job implements IDeviceInternal {
         McpRawMessage message = getMcpRawMessage();
         message.setMessageType(MESSAGE_TYPE.C_REQ);
         message.setSubType(USED);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
 
         //free
         message.setSubType(FREE);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
 
         //used percentage
         message.setSubType(USED_PERCENTAGE);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
 }

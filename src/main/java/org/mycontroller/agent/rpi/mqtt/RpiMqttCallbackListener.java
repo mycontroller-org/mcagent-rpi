@@ -26,7 +26,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.mycontroller.agent.rpi.AgentProperties;
 import org.mycontroller.standalone.AppProperties.NETWORK_TYPE;
 import org.mycontroller.standalone.message.RawMessage;
-import org.mycontroller.standalone.message.RawMessageQueue;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,7 +69,7 @@ public class RpiMqttCallbackListener implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) {
         try {
             _logger.debug("Message Received, Topic:[{}], Payload:[{}]", topic, message);
-            RawMessageQueue.getInstance().putMessage(RawMessage.builder()
+            AgentRawMessageQueue.getInstance().putMessage(RawMessage.builder()
                     .data(message.toString())
                     .subData(topic)
                     .networkType(NETWORK_TYPE.MY_CONTROLLER)

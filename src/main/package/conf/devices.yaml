@@ -15,6 +15,28 @@ gpio_devices:
   properties:
     pin: gpio 2
 
+- id: sample_pwm_out_gpio_23
+  name: Sample PWM out
+  type: PWM out
+  enabled: false
+  properties:
+    # All Raspberry Pi models support a hardware PWM pin on GPIO_01.
+    # models A+, B+, 2B, 3B also support hardware PWM pins: GPIO_23, GPIO_24, GPIO_26
+    pin: gpio 23
+    range: 1024
+    # supported modes: balanced, mark:space
+    # for detail refer http://wiringpi.com/reference/raspberry-pi-specifics/
+    mode: balanced
+    clock: 500
+
+- id: sample_soft_pwm_out_gpio_3
+  name: Sample Soft PWM out
+  type: Soft PWM out
+  enabled: false
+  properties:
+    pin: gpio 3
+    range: 100
+
 
 internal_devices:
 - id: cpu_temperature
@@ -25,15 +47,15 @@ internal_devices:
 - id: cpu_voltage
   enabled: true
   properties:
-    cron: 0 0/5 * * * ?
+    cron: 0 0/10 * * * ?
 
-- id: system_memory
+- id: memory_usage
   enabled: true
   properties:
     cron: 0 0/5 * * * ?
     unit: MB
 
-- id: system_cpu_usage
+- id: cpu_usage
   enabled: true
   properties:
     cron: 0/30 * * * * ?

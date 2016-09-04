@@ -16,9 +16,10 @@
  */
 package org.mycontroller.agent.rpi.mqtt;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.mycontroller.agent.rpi.utils.AgentUtils;
 import org.mycontroller.standalone.message.RawMessage;
-import org.mycontroller.standalone.message.RawMessageQueue;
 import org.mycontroller.standalone.utils.McUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,19 +30,14 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class AgentMessageMonitorThread implements Runnable {
-    private static boolean terminationIssued = false;
-    private static boolean terminated = false;
-    public static final long MYS_MSG_DELAY = 20; // delay time to avoid collisions in network, in milliseconds
+    private static final AtomicBoolean TERMINATION_ISSUED = new AtomicBoolean(false);
+    private static final AtomicBoolean TERMINATED = new AtomicBoolean(false);
 
-    public static boolean isTerminationIssued() {
-        return terminationIssued;
-    }
-
-    public static synchronized void setTerminationIssued(boolean terminationIssued) {
-        AgentMessageMonitorThread.terminationIssued = terminationIssued;
+    public static synchronized void shutdown() {
+        TERMINATION_ISSUED.set(true);
         long start = System.currentTimeMillis();
         long waitTime = McUtils.ONE_MINUTE;
-        while (!terminated) {
+        while (!TERMINATED.get()) {
             try {
                 Thread.sleep(10);
                 if ((System.currentTimeMillis() - start) >= waitTime) {
@@ -56,9 +52,9 @@ public class AgentMessageMonitorThread implements Runnable {
     }
 
     private void processRawMessage() {
-        while (!RawMessageQueue.getInstance().isEmpty() && !isTerminationIssued()) {
+        while (!AgentRawMessageQueue.getInstance().isEmpty() && !TERMINATION_ISSUED.get()) {
             if (RpiMqttClient.getInstance().isRunning()) {
-                RawMessage rawMessage = RawMessageQueue.getInstance().getMessage();
+                RawMessage rawMessage = AgentRawMessageQueue.getInstance().getMessage();
                 try {
                     _logger.debug("Processing message:[{}]", rawMessage);
                     if (rawMessage.isTxMessage()) {
@@ -85,7 +81,7 @@ public class AgentMessageMonitorThread implements Runnable {
     public void run() {
         try {
             _logger.debug("MessageMonitorThread new thread started.");
-            while (!isTerminationIssued()) {
+            while (!TERMINATION_ISSUED.get()) {
                 try {
                     this.processRawMessage();
                     Thread.sleep(10);
@@ -93,22 +89,17 @@ public class AgentMessageMonitorThread implements Runnable {
                     _logger.debug("Exception in sleep thread,", ex);
                 }
             }
-            if (!RawMessageQueue.getInstance().isEmpty()) {
+            if (!AgentRawMessageQueue.getInstance().isEmpty()) {
                 _logger.warn("MessageMonitorThread terminating with {} message(s) in queue!",
-                        RawMessageQueue.getInstance().getQueueSize());
+                        AgentRawMessageQueue.getInstance().getQueueSize());
             }
-            if (isTerminationIssued()) {
+            if (TERMINATION_ISSUED.get()) {
                 _logger.debug("MessageMonitorThread termination issues. Terminating.");
-                terminated = true;
+                TERMINATED.set(true);
             }
         } catch (Exception ex) {
-            terminated = true;
+            TERMINATED.set(true);
             _logger.error("MessageMonitorThread terminated!, ", ex);
         }
     }
-
-    public static boolean isTerminated() {
-        return terminated;
-    }
-
 }

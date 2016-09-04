@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DigitalOutput extends DeviceBase {
 
-    public static void setState(Pin ioPin, boolean state) {
+    public void setState(Pin ioPin, boolean state) {
         GpioPinDigitalOutput _pin = (GpioPinDigitalOutput) GPIO.getProvisionedPin(ioPin);
         if (_pin == null) {
             _pin = GPIO.provisionDigitalOutputPin(ioPin);
@@ -43,12 +43,12 @@ public class DigitalOutput extends DeviceBase {
         }
     }
 
-    public static void setState(DigitalOutputConf conf, boolean state) {
+    public void setState(DigitalOutputConf conf, boolean state) {
         _logger.debug("Changing pin state to >> {}, for {}", state, conf);
         setState(conf.getIoPin(), state);
     }
 
-    public static int getState(DigitalOutputConf conf) {
+    public int getState(DigitalOutputConf conf) {
         GpioPinDigitalOutput _pin = GPIO.provisionDigitalOutputPin(conf.getIoPin());
         return _pin.getState().getValue();
     }

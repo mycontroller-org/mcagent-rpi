@@ -22,6 +22,8 @@ import org.mycontroller.agent.rpi.AboutAgent;
 import org.mycontroller.agent.rpi.AgentProperties;
 import org.mycontroller.agent.rpi.devices.DigitalInput;
 import org.mycontroller.agent.rpi.devices.DigitalOutput;
+import org.mycontroller.agent.rpi.devices.PWMOutput;
+import org.mycontroller.agent.rpi.devices.SoftPWMOutput;
 import org.mycontroller.agent.rpi.devices.internal.DeviceIntUtils;
 import org.mycontroller.agent.rpi.devices.internal.IDeviceInternal;
 import org.mycontroller.agent.rpi.model.AgentTimer;
@@ -30,13 +32,15 @@ import org.mycontroller.agent.rpi.model.DeviceInternal;
 import org.mycontroller.agent.rpi.model.DigitalInputConf;
 import org.mycontroller.agent.rpi.model.DigitalOutputConf;
 import org.mycontroller.agent.rpi.model.IDeviceConf;
+import org.mycontroller.agent.rpi.model.PWMOutputConf;
+import org.mycontroller.agent.rpi.model.SoftPWMOutputConf;
+import org.mycontroller.agent.rpi.mqtt.AgentRawMessageQueue;
 import org.mycontroller.standalone.message.McMessage;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_INTERNAL;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_PRESENTATION;
 import org.mycontroller.standalone.message.RawMessage;
 import org.mycontroller.standalone.message.RawMessageException;
-import org.mycontroller.standalone.message.RawMessageQueue;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
 import org.mycontroller.standalone.provider.mc.McpUtils;
 import org.mycontroller.standalone.utils.McUtils;
@@ -71,7 +75,9 @@ public class AgentUtils {
 
     public enum DEVICE_TYPE {
         DIGITAL_OUT("Digital out"),
-        DIGITAL_IN("Digital in");
+        DIGITAL_IN("Digital in"),
+        SOFT_PWM_OUT("Soft PWM out"),
+        PWM_OUT("PWM out");
 
         private final String name;
 
@@ -146,10 +152,16 @@ public class AgentUtils {
                 switch (type) {
                     case DIGITAL_IN:
                         deviceConf = new DigitalInputConf(device);
-                        DigitalInput.listen((DigitalInputConf) deviceConf);
+                        new DigitalInput().listen((DigitalInputConf) deviceConf);
                         break;
                     case DIGITAL_OUT:
                         deviceConf = new DigitalOutputConf(device);
+                        break;
+                    case SOFT_PWM_OUT:
+                        deviceConf = new SoftPWMOutputConf(device);
+                        break;
+                    case PWM_OUT:
+                        deviceConf = new PWMOutputConf(device);
                         break;
                     default:
                         break;
@@ -214,7 +226,13 @@ public class AgentUtils {
                 //Nothing to do
                 break;
             case DIGITAL_OUT:
-                DigitalOutput.setState((DigitalOutputConf) deviceConf, McUtils.getBoolean(message.getPayload()));
+                new DigitalOutput().setState((DigitalOutputConf) deviceConf, McUtils.getBoolean(message.getPayload()));
+                break;
+            case SOFT_PWM_OUT:
+                new SoftPWMOutput().set((SoftPWMOutputConf) deviceConf, message);
+                break;
+            case PWM_OUT:
+                new PWMOutput().set((PWMOutputConf) deviceConf, message);
                 break;
             default:
                 _logger.warn("Not supported type:{}, {}", message, deviceConf);
@@ -226,17 +244,23 @@ public class AgentUtils {
     private static void processReqType(McpRawMessage message, IDeviceConf deviceConf) {
         switch (deviceConf.getType()) {
             case DIGITAL_IN:
-                message.setPayload(String.valueOf(DigitalInput.getState((DigitalInputConf) deviceConf)));
+                message.setPayload(String.valueOf(new DigitalInput().getState((DigitalInputConf) deviceConf)));
                 break;
             case DIGITAL_OUT:
-                message.setPayload(String.valueOf(DigitalOutput.getState((DigitalOutputConf) deviceConf)));
+                message.setPayload(String.valueOf(new DigitalOutput().getState((DigitalOutputConf) deviceConf)));
+                break;
+            case SOFT_PWM_OUT:
+                message.setPayload(new SoftPWMOutput().get((SoftPWMOutputConf) deviceConf, message));
+                break;
+            case PWM_OUT:
+                message.setPayload(new PWMOutput().get((PWMOutputConf) deviceConf, message));
                 break;
             default:
                 break;
         }
         message.setTxMessage(true);
         message.setMessageType(MESSAGE_TYPE.C_SET);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     private static void processInternal(McpRawMessage message) {
@@ -282,7 +306,7 @@ public class AgentUtils {
         message.setTopicsPublish(AgentProperties.getInstance().getRpiMqttProperties().getTopicPublish());
         message.setPayload(String.valueOf(System.currentTimeMillis()));
         message.setSubType(subType);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     private static void sendNodeInformation() {
@@ -296,30 +320,30 @@ public class AgentUtils {
 
         //Send node name
         message.setPayload(AgentProperties.NODE_INTERNAL);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
 
         message.setNodeEui(AgentProperties.getInstance().getNodeNameGpio());
         message.setPayload(AgentProperties.NODE_GPIO);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
 
         //Send node version
         message.setSubType(MESSAGE_TYPE_INTERNAL.I_SKETCH_VERSION.name());
         message.setPayload(about.getVersion());
         message.setNodeEui(AgentProperties.getInstance().getNodeNameInternal());
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
 
         message.setNodeEui(AgentProperties.getInstance().getNodeNameGpio());
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
 
         //Send node lib version
         message.setMessageType(MESSAGE_TYPE.C_PRESENTATION);
         message.setSubType(MESSAGE_TYPE_PRESENTATION.S_ARDUINO_REPEATER_NODE.name());
         message.setPayload(about.getLibVersion());
         message.setNodeEui(AgentProperties.getInstance().getNodeNameInternal());
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
 
         message.setNodeEui(AgentProperties.getInstance().getNodeNameGpio());
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
 
     }
 

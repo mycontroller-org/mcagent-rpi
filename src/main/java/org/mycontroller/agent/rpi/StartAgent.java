@@ -122,7 +122,7 @@ public class StartAgent {
         RpiMqttClient.getInstance().stop();
 
         //Stop Message monitor thread
-        AgentMessageMonitorThread.setTerminationIssued(true);
+        AgentMessageMonitorThread.shutdown();
 
         //Stop device(s) service
         AgentUtils.removeAllListeners();

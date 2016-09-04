@@ -20,10 +20,10 @@ import java.io.IOException;
 
 import org.knowm.sundial.Job;
 import org.knowm.sundial.exceptions.JobInterruptException;
+import org.mycontroller.agent.rpi.mqtt.AgentRawMessageQueue;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_PRESENTATION;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
-import org.mycontroller.standalone.message.RawMessageQueue;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
 
 import com.pi4j.system.SystemInfo;
@@ -52,7 +52,7 @@ public class CpuTemperature extends Job implements IDeviceInternal {
     private void sendPayload() {
         McpRawMessage message = getMcpRawMessage();
         message.setPayload(getTemperature());
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     private String getTemperature() {
@@ -67,9 +67,9 @@ public class CpuTemperature extends Job implements IDeviceInternal {
     @Override
     public void aboutMe() {
         McpRawMessage message = DeviceIntUtils.getPresentationMessage(DeviceIntUtils.KEY_CPU_TEMPERATURE);
-        message.setSubType(MESSAGE_TYPE_PRESENTATION.S_TEMP.name());
+        message.setSubType(MESSAGE_TYPE_PRESENTATION.S_CPU.name());
         message.setPayload(DeviceIntUtils.KEY_CPU_TEMPERATURE_NAME);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     @Override
@@ -83,7 +83,7 @@ public class CpuTemperature extends Job implements IDeviceInternal {
     public void sendSensorVariables() {
         McpRawMessage message = getMcpRawMessage();
         message.setMessageType(MESSAGE_TYPE.C_REQ);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
 }

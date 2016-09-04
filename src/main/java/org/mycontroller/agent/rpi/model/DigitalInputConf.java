@@ -16,10 +16,10 @@
  */
 package org.mycontroller.agent.rpi.model;
 
+import org.mycontroller.agent.rpi.mqtt.AgentRawMessageQueue;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_PRESENTATION;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
-import org.mycontroller.standalone.message.RawMessageQueue;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
 import org.mycontroller.standalone.utils.McUtils;
 
@@ -61,14 +61,14 @@ public class DigitalInputConf extends DeviceConf {
         McpRawMessage message = super.getPresentationMessage();
         message.setSubType(MESSAGE_TYPE_PRESENTATION.S_BINARY.name());
         message.setPayload(getName());
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     @Override
     public void sendSensorTypes() {
         McpRawMessage message = getMcpRawMessage();
         message.setMessageType(MESSAGE_TYPE.C_REQ);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     @Override

@@ -16,10 +16,13 @@
  */
 package org.mycontroller.agent.rpi.model;
 
+import java.util.Map;
+
 import org.mycontroller.agent.rpi.AgentProperties;
 import org.mycontroller.agent.rpi.utils.AgentUtils;
 import org.mycontroller.agent.rpi.utils.AgentUtils.DEVICE_TYPE;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE;
+import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
 
 import com.pi4j.io.gpio.Pin;
@@ -65,5 +68,22 @@ abstract class DeviceConf implements IDeviceConf {
         message.setSensorId(getId());
         message.setMessageType(MESSAGE_TYPE.C_SET);
         return message;
+    }
+
+    public McpRawMessage getMcpRawMessage(MESSAGE_TYPE_SET_REQ setReqType) {
+        McpRawMessage message = getPayloadMessage();
+        message.setSubType(setReqType.name());
+        return message;
+    }
+
+    protected String getValue(Map<String, String> properties, String key) {
+        return getValue(properties, key, null);
+    }
+
+    protected String getValue(Map<String, String> properties, String key, String defaultValue) {
+        if (properties.get(key) != null) {
+            return properties.get(key);
+        }
+        return defaultValue;
     }
 }

@@ -18,11 +18,11 @@ package org.mycontroller.agent.rpi.devices.internal;
 
 import org.knowm.sundial.Job;
 import org.knowm.sundial.exceptions.JobInterruptException;
+import org.mycontroller.agent.rpi.mqtt.AgentRawMessageQueue;
 import org.mycontroller.standalone.api.jaxrs.utils.StatusBase;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_PRESENTATION;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
-import org.mycontroller.standalone.message.RawMessageQueue;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
 
 import lombok.NoArgsConstructor;
@@ -49,7 +49,7 @@ public class CpuUsage extends Job implements IDeviceInternal {
     private void sendPayload() {
         McpRawMessage message = getMcpRawMessage();
         message.setPayload(getUsage());
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     private String getUsage() {
@@ -63,15 +63,15 @@ public class CpuUsage extends Job implements IDeviceInternal {
 
     @Override
     public void aboutMe() {
-        McpRawMessage message = DeviceIntUtils.getPresentationMessage(DeviceIntUtils.KEY_SYSTEM_CPU_USAGE);
-        message.setSubType(MESSAGE_TYPE_PRESENTATION.S_CUSTOM.name());
-        message.setPayload(DeviceIntUtils.KEY_SYSTEM_CPU_USAGE_NAME);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        McpRawMessage message = DeviceIntUtils.getPresentationMessage(DeviceIntUtils.KEY_CPU_USAGE);
+        message.setSubType(MESSAGE_TYPE_PRESENTATION.S_CPU.name());
+        message.setPayload(DeviceIntUtils.KEY_CPU_USAGE_NAME);
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     @Override
     public McpRawMessage getMcpRawMessage() {
-        McpRawMessage message = DeviceIntUtils.getPayloadMessage(DeviceIntUtils.KEY_SYSTEM_CPU_USAGE);
+        McpRawMessage message = DeviceIntUtils.getPayloadMessage(DeviceIntUtils.KEY_CPU_USAGE);
         message.setSubType(MESSAGE_TYPE_SET_REQ.V_PERCENTAGE.name());
         return message;
     }
@@ -80,7 +80,7 @@ public class CpuUsage extends Job implements IDeviceInternal {
     public void sendSensorVariables() {
         McpRawMessage message = getMcpRawMessage();
         message.setMessageType(MESSAGE_TYPE.C_REQ);
-        RawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
 }

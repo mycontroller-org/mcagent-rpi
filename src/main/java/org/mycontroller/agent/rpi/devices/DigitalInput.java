@@ -27,7 +27,7 @@ import com.pi4j.io.gpio.GpioPinDigitalInput;
  */
 public class DigitalInput extends DeviceBase {
 
-    public static void listen(DigitalInputConf conf) {
+    public void listen(DigitalInputConf conf) {
         GpioPinDigitalInput listenPin = GPIO.provisionDigitalInputPin(conf.getIoPin(), conf.getPullResistance());
         listenPin.setShutdownOptions(true);
         if (conf.getDebounceInterval() != null) {
@@ -36,7 +36,7 @@ public class DigitalInput extends DeviceBase {
         listenPin.addListener(new DigitalInputPinListener(conf));
     }
 
-    public static int getState(DigitalInputConf conf) {
+    public int getState(DigitalInputConf conf) {
         GpioPinDigitalInput listenPin = (GpioPinDigitalInput) GPIO.getProvisionedPin(conf.getIoPin());
         if (listenPin == null) {
             listen(conf);

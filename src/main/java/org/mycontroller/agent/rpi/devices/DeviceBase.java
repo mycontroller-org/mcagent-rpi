@@ -16,6 +16,9 @@
  */
 package org.mycontroller.agent.rpi.devices;
 
+import org.knowm.sundial.Job;
+import org.knowm.sundial.exceptions.JobInterruptException;
+
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 
@@ -23,10 +26,14 @@ import com.pi4j.io.gpio.GpioFactory;
  * @author Jeeva Kandasamy (jkandasa)
  * @since 0.0.1
  */
-abstract class DeviceBase {
+abstract class DeviceBase extends Job {
     static final GpioController GPIO = GpioFactory.getInstance();
 
     public static void removeAllListeners() {
         GPIO.removeAllListeners();
+    }
+
+    public void doRun() throws JobInterruptException {
+        //Dummy
     }
 }

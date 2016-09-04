@@ -21,38 +21,43 @@ import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_PRESENTATION;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
+import org.mycontroller.standalone.utils.McUtils;
 
 import com.pi4j.io.gpio.Pin;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.ToString;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
  * @since 0.0.1
  */
-@Getter
+@Data
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true)
-public class DigitalOutputConf extends DeviceConf {
+public class SoftPWMOutputConf extends DeviceConf {
+    public static final String KEY_RANGE = "range";
     private Pin ioPin;
+    private Integer range;
 
-    public DigitalOutputConf(Device device) {
+    public SoftPWMOutputConf(Device device) {
         super(device);
         ioPin = super.getPinByName(device.getProperties().get(KEY_PIN));
+        range = McUtils.getInteger(getValue(device.getProperties(), KEY_RANGE, "100"));
     }
 
     @Override
     public void aboutMe() {
         McpRawMessage message = super.getPresentationMessage();
-        message.setSubType(MESSAGE_TYPE_PRESENTATION.S_BINARY.name());
+        message.setSubType(MESSAGE_TYPE_PRESENTATION.S_PWM.name());
         message.setPayload(getName());
         AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     @Override
     public void sendSensorTypes() {
+        //Send Rate message
         McpRawMessage message = getMcpRawMessage();
         message.setMessageType(MESSAGE_TYPE.C_REQ);
         AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
@@ -60,8 +65,6 @@ public class DigitalOutputConf extends DeviceConf {
 
     @Override
     public McpRawMessage getMcpRawMessage() {
-        McpRawMessage message = super.getPayloadMessage();
-        message.setSubType(MESSAGE_TYPE_SET_REQ.V_STATUS.name());
-        return message;
+        return super.getMcpRawMessage(MESSAGE_TYPE_SET_REQ.V_RATE);
     }
 }

@@ -35,20 +35,20 @@ import lombok.NoArgsConstructor;
 public class DeviceIntUtils {
     public static final String KEY_CPU_TEMPERATURE = "cpu_temperature";
     public static final String KEY_CPU_TEMPERATURE_NAME = "CPU temperature";
-    public static final String KEY_SYSTEM_CPU_USAGE = "system_cpu_usage";
-    public static final String KEY_SYSTEM_CPU_USAGE_NAME = "System cpu usage";
+    public static final String KEY_CPU_USAGE = "cpu_usage";
+    public static final String KEY_CPU_USAGE_NAME = "CPU usage";
     public static final String KEY_CPU_VOLTAGE = "cpu_voltage";
     public static final String KEY_CPU_VOLTAGE_NAME = "CPU voltage";
-    public static final String KEY_SYSTEM_MEMORY = "system_memory";
-    public static final String KEY_SYSTEM_MEMORY_NAME = "System memory";
+    public static final String KEY_MEMORY_USAGE = "memory_usage";
+    public static final String KEY_MEMORY_USAGE_NAME = "Memory usage";
 
     public static final HashMap<String, DeviceInternal> LOADED_DEVICES = new HashMap<String, DeviceInternal>();
     public static final HashMap<String, String> CLASSES_MAP = new HashMap<String, String>();
     static {
         CLASSES_MAP.put(KEY_CPU_TEMPERATURE, CpuTemperature.class.getName());
         CLASSES_MAP.put(KEY_CPU_VOLTAGE, CpuVoltage.class.getName());
-        CLASSES_MAP.put(KEY_SYSTEM_MEMORY, SystemMemory.class.getName());
-        CLASSES_MAP.put(KEY_SYSTEM_CPU_USAGE, CpuUsage.class.getName());
+        CLASSES_MAP.put(KEY_MEMORY_USAGE, SystemMemory.class.getName());
+        CLASSES_MAP.put(KEY_CPU_USAGE, CpuUsage.class.getName());
     }
 
     public static McpRawMessage getPresentationMessage(String sensorId) {
