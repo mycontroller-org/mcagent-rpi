@@ -1,7 +1,7 @@
 gpio_devices:
 - id: sample_digital_in_gpio_0
   name: Sample digital input switch
-  type: Digital in
+  type: DIGITAL_IN
   enabled: true
   properties:
     pin: gpio 0
@@ -10,14 +10,14 @@ gpio_devices:
 
 - id: sample_digital_out_gpio_2
   name: Sample on/off relay control
-  type: digital out
+  type: DIGITAL_OUT
   enabled: true
   properties:
     pin: gpio 2
 
 - id: sample_pwm_out_gpio_23
   name: Sample PWM out
-  type: PWM out
+  type: PWM_OUT
   enabled: false
   properties:
     # All Raspberry Pi models support a hardware PWM pin on GPIO_01.
@@ -31,11 +31,21 @@ gpio_devices:
 
 - id: sample_soft_pwm_out_gpio_3
   name: Sample Soft PWM out
-  type: Soft PWM out
+  type: SOFT_PWM_OUT
   enabled: false
   properties:
     pin: gpio 3
     range: 100
+
+- id: temperature_ds18b20
+  name: Temperature sensor
+  type: TEMPERATURE_DS18B20
+  enabled: true
+  properties:
+    device_address: 28-011615318bee
+    # scale can be either CELSIUS, FARENHEIT, KELVIN or RANKINE
+    scale: CELSIUS
+    cron: 0,30 * * * * ?
 
 
 internal_devices:

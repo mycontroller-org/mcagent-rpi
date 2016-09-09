@@ -39,15 +39,18 @@ import lombok.ToString;
 @ToString
 abstract class DeviceConf implements IDeviceConf {
     public static final String KEY_PIN = "pin";
+    public static final String CRON_EXPRESSION = "cron";
 
     private String id;
     private String name;
     private DEVICE_TYPE type;
+    private String cron;
 
     public DeviceConf(Device device) {
         id = device.getId();
         name = device.getName();
-        type = DEVICE_TYPE.fromString(device.getType());
+        type = DEVICE_TYPE.valueOf(device.getType().toUpperCase().replaceAll(" ", "_"));
+        cron = getValue(device.getProperties(), CRON_EXPRESSION);
     }
 
     protected Pin getPinByName(String pinName) {
@@ -85,5 +88,9 @@ abstract class DeviceConf implements IDeviceConf {
             return properties.get(key);
         }
         return defaultValue;
+    }
+
+    public void sendMeasurments() {
+        //Override on child classes
     }
 }

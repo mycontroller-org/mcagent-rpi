@@ -14,32 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mycontroller.agent.rpi.model;
+package org.mycontroller.agent.rpi.jobs;
 
-import java.util.HashMap;
+import org.knowm.sundial.Job;
+import org.knowm.sundial.JobContext;
+import org.knowm.sundial.exceptions.JobInterruptException;
+import org.mycontroller.agent.rpi.model.IDeviceConf;
+import org.mycontroller.agent.rpi.utils.AgentUtils;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
  * @since 0.0.1
  */
-@Data
-@Builder
-public class AgentTimer {
-    public static final String CRON_JOB_PREFIX = "cron_job_";
-    public static final String INTERNAL_JOB_PREFIX = "internal_job_";
-    public static final String JOB_PREFIX = "device_job_";
-    private String jobName;
-    private String cronExpression;
-    private String targetClass;
-    private HashMap<String, Object> data;
+@Slf4j
+public class SendMeasurments extends Job {
 
-    public HashMap<String, Object> getData() {
-        if (data == null) {
-            data = new HashMap<String, Object>();
+    @Override
+    public void doRun() throws JobInterruptException {
+        JobContext context = getJobContext();
+        IDeviceConf conf = (IDeviceConf) context.map.get(AgentUtils.KEY_GPIO_DEVICE_CONF);
+        try {
+            conf.sendMeasurments();
+            _logger.debug("Measurment sent for {}", conf);
+        } catch (Exception ex) {
+            _logger.error("Exception, {}", conf, ex);
         }
-        return data;
     }
+
 }

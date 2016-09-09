@@ -24,8 +24,10 @@ import org.mycontroller.agent.rpi.devices.DigitalInput;
 import org.mycontroller.agent.rpi.devices.DigitalOutput;
 import org.mycontroller.agent.rpi.devices.PWMOutput;
 import org.mycontroller.agent.rpi.devices.SoftPWMOutput;
+import org.mycontroller.agent.rpi.devices.TemperatureDS18B20;
 import org.mycontroller.agent.rpi.devices.internal.DeviceIntUtils;
 import org.mycontroller.agent.rpi.devices.internal.IDeviceInternal;
+import org.mycontroller.agent.rpi.jobs.SendMeasurments;
 import org.mycontroller.agent.rpi.model.AgentTimer;
 import org.mycontroller.agent.rpi.model.Device;
 import org.mycontroller.agent.rpi.model.DeviceInternal;
@@ -34,6 +36,7 @@ import org.mycontroller.agent.rpi.model.DigitalOutputConf;
 import org.mycontroller.agent.rpi.model.IDeviceConf;
 import org.mycontroller.agent.rpi.model.PWMOutputConf;
 import org.mycontroller.agent.rpi.model.SoftPWMOutputConf;
+import org.mycontroller.agent.rpi.model.TemperatureDS18B20Conf;
 import org.mycontroller.agent.rpi.mqtt.AgentRawMessageQueue;
 import org.mycontroller.standalone.message.McMessage;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE;
@@ -56,7 +59,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AgentUtils {
-    private static HashMap<String, IDeviceConf> devicesMap = new HashMap<>();
+    private static final HashMap<String, IDeviceConf> DEVICES_MAP = new HashMap<>();
+    public static final String KEY_GPIO_DEVICE_CONF = "gpioDeviceConf";
 
     public static Long getDividerForData(String unit) {
         if (unit == null) {
@@ -77,7 +81,8 @@ public class AgentUtils {
         DIGITAL_OUT("Digital out"),
         DIGITAL_IN("Digital in"),
         SOFT_PWM_OUT("Soft PWM out"),
-        PWM_OUT("PWM out");
+        PWM_OUT("PWM out"),
+        TEMPERATURE_DS18B20("Temperature DS18B20");
 
         private final String name;
 
@@ -111,7 +116,7 @@ public class AgentUtils {
     }
 
     public static IDeviceConf getDeviceConf(String key) {
-        return devicesMap.get(key);
+        return DEVICES_MAP.get(key);
     }
 
     private static void loadInternalDevice() {
@@ -142,13 +147,13 @@ public class AgentUtils {
 
     private static void loadGpioDevice() {
         for (Device device : AgentProperties.getInstance().getDevices()) {
-            DEVICE_TYPE type = DEVICE_TYPE.fromString(device.getType());
+            DEVICE_TYPE type = DEVICE_TYPE.valueOf(device.getType().toUpperCase().replaceAll(" ", "_"));
             IDeviceConf deviceConf = null;
             if (device.getEnabled() == null || !device.getEnabled()) {
                 _logger.debug("This device is in disabled state! {}", device);
                 continue;
             }
-            if (type != null && devicesMap.get(device.getId()) == null) {
+            if (type != null && DEVICES_MAP.get(device.getId()) == null) {
                 switch (type) {
                     case DIGITAL_IN:
                         deviceConf = new DigitalInputConf(device);
@@ -163,14 +168,26 @@ public class AgentUtils {
                     case PWM_OUT:
                         deviceConf = new PWMOutputConf(device);
                         break;
+                    case TEMPERATURE_DS18B20:
+                        deviceConf = new TemperatureDS18B20Conf(device);
+                        break;
                     default:
                         break;
 
                 }
                 if (deviceConf != null) {
-                    devicesMap.put(deviceConf.getId(), deviceConf);
+                    DEVICES_MAP.put(deviceConf.getId(), deviceConf);
+                    if (deviceConf.getCron() != null) {
+                        AgentTimer timer = AgentTimer.builder()
+                                .jobName(device.getId())
+                                .cronExpression(deviceConf.getCron())
+                                .targetClass(SendMeasurments.class.getName())
+                                .build();
+                        timer.getData().put(KEY_GPIO_DEVICE_CONF, deviceConf);
+                        AgentSchedulerUtils.addJob(timer);
+                    }
                 }
-            } else if (devicesMap.get(device.getId()) != null) {
+            } else if (DEVICES_MAP.get(device.getId()) != null) {
                 _logger.error("With this id a device already available! {}", device);
             }
         }
@@ -255,11 +272,15 @@ public class AgentUtils {
             case PWM_OUT:
                 message.setPayload(new PWMOutput().get((PWMOutputConf) deviceConf, message));
                 break;
+            case TEMPERATURE_DS18B20:
+                message.setPayload(new TemperatureDS18B20().get((TemperatureDS18B20Conf) deviceConf, message));
+                break;
             default:
                 break;
         }
         message.setTxMessage(true);
         message.setMessageType(MESSAGE_TYPE.C_SET);
+        message.setTopicsPublish(AgentProperties.getInstance().getRpiMqttProperties().getTopicPublish());
         AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
@@ -352,7 +373,7 @@ public class AgentUtils {
         sendNodeInformation();
 
         //Send sensor details
-        for (String deviceId : devicesMap.keySet()) {
+        for (String deviceId : DEVICES_MAP.keySet()) {
             IDeviceConf conf = getDeviceConf(deviceId);
             conf.aboutMe();
             conf.sendSensorTypes();

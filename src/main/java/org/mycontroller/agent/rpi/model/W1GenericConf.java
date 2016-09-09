@@ -16,29 +16,31 @@
  */
 package org.mycontroller.agent.rpi.model;
 
-import org.mycontroller.agent.rpi.utils.AgentUtils.DEVICE_TYPE;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
  * @since 0.0.1
  */
-public interface IDeviceConf {
-    String getId();
+@Data
+@EqualsAndHashCode(callSuper = false)
+@ToString(callSuper = true)
+public abstract class W1GenericConf extends DeviceConf {
+    public static final String KEY_DEVICE_ADDRESS = "device_address";
+    private String deviceAddress;
 
-    DEVICE_TYPE getType();
+    public W1GenericConf(Device device) {
+        super(device);
+        deviceAddress = getValue(device.getProperties(), KEY_DEVICE_ADDRESS);
+    }
 
-    String getCron();
-
-    void aboutMe();
-
-    void sendSensorTypes();
-
-    McpRawMessage getMcpRawMessage();
-
-    McpRawMessage getMcpRawMessage(MESSAGE_TYPE_SET_REQ setReqType);
-
-    void sendMeasurments();
+    public McpRawMessage getMcpRawMessageId() {
+        return super.getMcpRawMessage(MESSAGE_TYPE_SET_REQ.V_ID);
+    }
 
 }
