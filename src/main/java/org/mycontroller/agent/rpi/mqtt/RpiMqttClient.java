@@ -16,6 +16,7 @@
  */
 package org.mycontroller.agent.rpi.mqtt;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -61,7 +62,8 @@ public class RpiMqttClient implements Runnable {
         }
         try {
             RpiMqttProperties _properties = AgentProperties.getInstance().getRpiMqttProperties();
-            mqttClient = new MqttClient(_properties.getBrokerHost(), _properties.getClientId());
+            mqttClient = new MqttClient(_properties.getBrokerHost(), _properties.getClientId() + "_"
+                    + RandomStringUtils.randomAlphanumeric(5));
             MqttConnectOptions connectOptions = new MqttConnectOptions();
             connectOptions.setConnectionTimeout(CONNECTION_TIME_OUT);
             connectOptions.setKeepAliveInterval(KEEP_ALIVE);

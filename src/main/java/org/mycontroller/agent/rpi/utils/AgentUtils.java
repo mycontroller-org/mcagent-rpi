@@ -78,21 +78,11 @@ public class AgentUtils {
     }
 
     public enum DEVICE_TYPE {
-        DIGITAL_OUT("Digital out"),
-        DIGITAL_IN("Digital in"),
-        SOFT_PWM_OUT("Soft PWM out"),
-        PWM_OUT("PWM out"),
-        TEMPERATURE_DS18B20("Temperature DS18B20");
-
-        private final String name;
-
-        private DEVICE_TYPE(String name) {
-            this.name = name;
-        }
-
-        public String getText() {
-            return this.name;
-        }
+        DIGITAL_OUT,
+        DIGITAL_IN,
+        SOFT_PWM_OUT,
+        PWM_OUT,
+        TEMPERATURE_DS18B20;
 
         public static DEVICE_TYPE get(int id) {
             for (DEVICE_TYPE type : values()) {
@@ -101,17 +91,6 @@ public class AgentUtils {
                 }
             }
             throw new IllegalArgumentException(String.valueOf(id));
-        }
-
-        public static DEVICE_TYPE fromString(String text) {
-            if (text != null) {
-                for (DEVICE_TYPE type : DEVICE_TYPE.values()) {
-                    if (text.equalsIgnoreCase(type.getText())) {
-                        return type;
-                    }
-                }
-            }
-            return null;
         }
     }
 
@@ -291,14 +270,14 @@ public class AgentUtils {
             case I_DEBUG:
                 break;
             case I_HEARTBEAT:
-                genericResponse(message, MESSAGE_TYPE_INTERNAL.I_HEARTBEAT_RESPONSE.getText());
+                genericResponse(message, MESSAGE_TYPE_INTERNAL.I_HEARTBEAT_RESPONSE.name());
                 break;
             case I_ID_RESPONSE:
                 break;
             case I_LOG_MESSAGE:
                 break;
             case I_PING:
-                genericResponse(message, MESSAGE_TYPE_INTERNAL.I_PONG.getText());
+                genericResponse(message, MESSAGE_TYPE_INTERNAL.I_PONG.name());
                 break;
             case I_DISCOVER:
             case I_PRESENTATION:

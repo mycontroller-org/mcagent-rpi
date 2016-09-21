@@ -25,6 +25,9 @@ import org.mycontroller.agent.rpi.mqtt.RpiMqttClient;
 import org.mycontroller.agent.rpi.utils.AgentSchedulerUtils;
 import org.mycontroller.agent.rpi.utils.AgentUtils;
 
+import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.RaspiGpioProvider;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -80,6 +83,7 @@ public class StartAgent {
     public static void startServices() {
         // Start service order
         // - Add Shutdown hook
+        // - Set pin numbering scheme
         // - start scheduler
         // - Start message Monitor Thread
         // - start device(s) services
@@ -88,6 +92,9 @@ public class StartAgent {
 
         //Add Shutdown hook
         new AgentShutdownHook().attachShutDownHook();
+
+        //Set default pin numbering scheme
+        GpioFactory.setDefaultProvider(new RaspiGpioProvider(AgentProperties.getInstance().getPinNumberingScheme()));
 
         //Start scheduler
         AgentSchedulerUtils.startScheduler();

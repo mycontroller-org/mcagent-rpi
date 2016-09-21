@@ -26,7 +26,9 @@ import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
 
 import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.RaspiBcmPin;
 import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.io.gpio.RaspiPinNumberingScheme;
 
 import lombok.Getter;
 import lombok.ToString;
@@ -54,7 +56,11 @@ abstract class DeviceConf implements IDeviceConf {
     }
 
     protected Pin getPinByName(String pinName) {
-        return RaspiPin.getPinByName(pinName.toUpperCase());
+        if (AgentProperties.getInstance().getPinNumberingScheme() == RaspiPinNumberingScheme.BROADCOM_PIN_NUMBERING) {
+            return RaspiBcmPin.getPinByName(pinName.toUpperCase());
+        } else {
+            return RaspiPin.getPinByName(pinName.toUpperCase());
+        }
     }
 
     protected McpRawMessage getPresentationMessage() {

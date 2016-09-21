@@ -42,9 +42,11 @@ gpio_devices:
   type: TEMPERATURE_DS18B20
   enabled: true
   properties:
+    # device address(optional), when you leave blank takes first DS18B20 device
     device_address: 28-011615318bee
-    # scale can be either CELSIUS, FARENHEIT, KELVIN or RANKINE
+    # scale can be either CELSIUS, FARENHEIT, KELVIN or RANKINE. Default > CELSIUS
     scale: CELSIUS
+    # cron (optionl). If you want to send temperature in a peorid of time, configure cron
     cron: 0,30 * * * * ?
 
 

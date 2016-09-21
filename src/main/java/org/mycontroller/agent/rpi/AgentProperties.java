@@ -29,6 +29,8 @@ import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+import com.pi4j.io.gpio.RaspiPinNumberingScheme;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -59,6 +61,7 @@ public class AgentProperties {
     private String nodeNameGpio;
     private List<Device> devices;
     private List<DeviceInternal> devicesInternal;
+    private RaspiPinNumberingScheme pinNumberingScheme;
 
     public static AgentProperties getInstance() {
         return _instance;
@@ -95,6 +98,13 @@ public class AgentProperties {
                 .topicPublish(getValue(properties, "mcac.mqtt.topic.publish", "rpiagent-out"))
                 .topicSubscribe(mqttTopicSubscribe.endsWith("/#") ? mqttTopicSubscribe : mqttTopicSubscribe + "/#")
                 .build();
+        try {
+            pinNumberingScheme = RaspiPinNumberingScheme.valueOf(getValue(properties, "mcac.pin.numbering.scheme",
+                    "DEFAULT_PIN_NUMBERING").toUpperCase());
+        } catch (Exception ex) {
+            _logger.warn("Unknown pin numbering scheme! set to 'DEFAULT_PIN_NUMBERING'");
+            pinNumberingScheme = RaspiPinNumberingScheme.DEFAULT_PIN_NUMBERING;
+        }
 
         //Load devices
         String yamlFile = FileUtils.readFileToString(FileUtils.getFile(getDevicesConfFile()));
