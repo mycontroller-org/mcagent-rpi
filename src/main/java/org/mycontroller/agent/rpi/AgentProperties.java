@@ -88,14 +88,16 @@ public class AgentProperties {
         // get/create devices configuration location
         devicesConfFile = getValue(properties, "mcac.devices.configuration", "../conf/devices.yaml");
 
-        String mqttTopicSubscribe = getValue(properties, "mcac.mqtt.topic.subscribe", "rpiagent-in");
+        String feed = getValue(properties, "mcac.mqtt.feed", "rpiagent");
+        String mqttTopicSubscribe = "in_" + feed;
+        String mqttTopicPublish = "out_" + feed;
 
         rpiMqttProperties = RpiMqttProperties.builder()
                 .brokerHost(getValue(properties, "mcac.mqtt.broker.host", "tcp://localhost:1883"))
                 .clientId(getValue(properties, "mcac.mqtt.clientid", "rpi-agent"))
                 .username(getValue(properties, "mcac.mqtt.username", ""))
                 .password(getValue(properties, "mcac.mqtt.password", ""))
-                .topicPublish(getValue(properties, "mcac.mqtt.topic.publish", "rpiagent-out"))
+                .topicPublish(mqttTopicPublish)
                 .topicSubscribe(mqttTopicSubscribe.endsWith("/#") ? mqttTopicSubscribe : mqttTopicSubscribe + "/#")
                 .build();
         try {
