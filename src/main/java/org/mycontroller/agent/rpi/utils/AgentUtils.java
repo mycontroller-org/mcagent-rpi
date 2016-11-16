@@ -192,8 +192,12 @@ public class AgentUtils {
     public static void processReceivedMessage(RawMessage rawMessage) throws RawMessageException {
         McpRawMessage message = new McpRawMessage(rawMessage);
         if (message.getAck() == McMessage.ACK_REQUEST) {
-            message.setAck(McMessage.ACK_RESPONSE);
-            AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
+            message.setAck(McMessage.NO_ACK);//Reset ack request
+            McpRawMessage _msg = message.clone();//Create new msg to respond ack
+            _msg.setAck(McMessage.ACK_RESPONSE);
+            _msg.setTopicsPublish(AgentProperties.getInstance().getRpiMqttProperties().getTopicPublish());
+            _msg.setTxMessage(true);
+            AgentRawMessageQueue.getInstance().putMessage(_msg.getRawMessage());
         } else if (message.getAck() == McMessage.ACK_RESPONSE) {
             _logger.debug("This is ack response message: {}", message);
             return;
