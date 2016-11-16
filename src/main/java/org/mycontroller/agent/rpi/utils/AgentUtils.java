@@ -191,6 +191,13 @@ public class AgentUtils {
 
     public static void processReceivedMessage(RawMessage rawMessage) throws RawMessageException {
         McpRawMessage message = new McpRawMessage(rawMessage);
+        if (message.getAck() == McMessage.ACK_REQUEST) {
+            message.setAck(McMessage.ACK_RESPONSE);
+            AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        } else if (message.getAck() == McMessage.ACK_RESPONSE) {
+            _logger.debug("This is ack response message: {}", message);
+            return;
+        }
         IDeviceConf deviceConf = getDeviceConf(message.getSensorId());
         if (deviceConf == null
                 && (message.getMessageType() == MESSAGE_TYPE.C_SET || message.getMessageType() == MESSAGE_TYPE.C_REQ)) {
