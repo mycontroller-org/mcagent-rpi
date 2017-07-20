@@ -73,7 +73,8 @@ Few examples,
    * `pin`: pin number on RPI
    * `pull_resistance`: supported types: `pull_up`, `pull_down` and `off`
    * `debounce_interval`: debounce_interval in milliseconds
-   
+
+
 #### Output (on/off switch)
 ```yaml
 - id: sample_digital_out_gpio_2
