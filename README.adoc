@@ -27,9 +27,10 @@ Now you can see the list of internal sensors on MyController server.
 image::extra/images/rpi-internal-sensors.png[RPI internal sensors]
 
 #### MCagent properties:
+
 * File location: `conf/mcagent.properties`
 * Default `pin.numbering.scheme`: `DEFAULT_PIN_NUMBERING`. Supported options: `DEFAULT_PIN_NUMBERING`, `BROADCOM_PIN_NUMBERING `
-**To know more about `pin.numbering.scheme` http://pi4j.com/pin-numbering-scheme.html[click here]
+* To know more about `pin.numbering.scheme` http://pi4j.com/pin-numbering-scheme.html[click here]
 * when you are running this agent on remote RPI, configure MQTT settings on this file,
 ```
 #========================================================================
@@ -48,6 +49,7 @@ mcac.mqtt.feed=rpiagent
 
 #### How to control GPIO pins
 You can control any GPIO from MyController. However, you have to do one-time setup on `MCagent` as follows.
+
 ##### Steps:
 * Add GPIO entry on the file `conf/devices.yaml` **Note:** you should follow YAML syntax.
 * GPIO pins should be added under `gpio_devices:`
