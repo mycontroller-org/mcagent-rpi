@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -65,9 +65,7 @@ public class StartAgent {
         try {
             Properties properties = new Properties();
             if (propertiesFile == null) {
-                properties
-                        .load(ClassLoader.getSystemClassLoader().getResourceAsStream("mcagent.properties"));
-
+                properties.load(ClassLoader.getSystemClassLoader().getResourceAsStream("mcagent.properties"));
             } else {
                 properties.load(new FileReader(propertiesFile));
             }

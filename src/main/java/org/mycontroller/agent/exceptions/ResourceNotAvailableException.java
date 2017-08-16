@@ -14,32 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mycontroller.agent.rpi.model;
-
-import org.mycontroller.agent.exceptions.ResourceNotAvailableException;
-import org.mycontroller.agent.rpi.utils.AgentUtils.DEVICE_TYPE;
-import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
-import org.mycontroller.standalone.provider.mc.McpRawMessage;
+package org.mycontroller.agent.exceptions;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
  * @since 0.0.1
  */
-public interface IDeviceConf {
-    String getId();
+public class ResourceNotAvailableException extends Exception {
 
-    DEVICE_TYPE getType();
+    /**  */
+    private static final long serialVersionUID = 1L;
 
-    String getCron();
-
-    void aboutMe();
-
-    void sendSensorTypes();
-
-    McpRawMessage getMcpRawMessage();
-
-    McpRawMessage getMcpRawMessage(MESSAGE_TYPE_SET_REQ setReqType);
-
-    void sendMeasurments() throws ResourceNotAvailableException;
+    public ResourceNotAvailableException(String message) {
+        super(message);
+    }
 
 }

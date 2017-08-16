@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,7 @@ abstract class DeviceBase extends Job {
         GPIO.removeAllListeners();
     }
 
+    @Override
     public void doRun() throws JobInterruptException {
         //Dummy
     }

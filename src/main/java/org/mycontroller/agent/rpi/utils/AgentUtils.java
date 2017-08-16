@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package org.mycontroller.agent.rpi.utils;
 
 import java.util.HashMap;
 
+import org.mycontroller.agent.exceptions.ResourceNotAvailableException;
 import org.mycontroller.agent.rpi.AboutAgent;
 import org.mycontroller.agent.rpi.AgentProperties;
 import org.mycontroller.agent.rpi.devices.DigitalInput;
@@ -249,29 +250,34 @@ public class AgentUtils {
     }
 
     private static void processReqType(McpRawMessage message, IDeviceConf deviceConf) {
-        switch (deviceConf.getType()) {
-            case DIGITAL_IN:
-                message.setPayload(String.valueOf(new DigitalInput().getState((DigitalInputConf) deviceConf)));
-                break;
-            case DIGITAL_OUT:
-                message.setPayload(String.valueOf(new DigitalOutput().getState((DigitalOutputConf) deviceConf)));
-                break;
-            case SOFT_PWM_OUT:
-                message.setPayload(new SoftPWMOutput().get((SoftPWMOutputConf) deviceConf, message));
-                break;
-            case PWM_OUT:
-                message.setPayload(new PWMOutput().get((PWMOutputConf) deviceConf, message));
-                break;
-            case TEMPERATURE_DS18B20:
-                message.setPayload(new TemperatureDS18B20().get((TemperatureDS18B20Conf) deviceConf, message));
-                break;
-            default:
-                break;
+        try {
+            switch (deviceConf.getType()) {
+                case DIGITAL_IN:
+                    message.setPayload(String.valueOf(new DigitalInput().getState((DigitalInputConf) deviceConf)));
+                    break;
+                case DIGITAL_OUT:
+                    message.setPayload(String.valueOf(new DigitalOutput().getState((DigitalOutputConf) deviceConf)));
+                    break;
+                case SOFT_PWM_OUT:
+                    message.setPayload(new SoftPWMOutput().get((SoftPWMOutputConf) deviceConf, message));
+                    break;
+                case PWM_OUT:
+                    message.setPayload(new PWMOutput().get((PWMOutputConf) deviceConf, message));
+                    break;
+                case TEMPERATURE_DS18B20:
+                    message.setPayload(new TemperatureDS18B20().get((TemperatureDS18B20Conf) deviceConf, message));
+                    break;
+                default:
+                    break;
+            }
+            message.setTxMessage(true);
+            message.setMessageType(MESSAGE_TYPE.C_SET);
+            message.setTopicsPublish(AgentProperties.getInstance().getRpiMqttProperties().getTopicPublish());
+            AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
+        } catch (ResourceNotAvailableException ex) {
+            _logger.error("Exception,", ex);
         }
-        message.setTxMessage(true);
-        message.setMessageType(MESSAGE_TYPE.C_SET);
-        message.setTopicsPublish(AgentProperties.getInstance().getRpiMqttProperties().getTopicPublish());
-        AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
+
     }
 
     private static void processInternal(McpRawMessage message) {

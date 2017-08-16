@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
  */
 package org.mycontroller.agent.rpi.devices;
 
+import org.mycontroller.agent.exceptions.ResourceNotAvailableException;
 import org.mycontroller.agent.rpi.model.TemperatureDS18B20Conf;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
@@ -32,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TemperatureDS18B20 extends W1GenericDevice {
-    public String get(TemperatureDS18B20Conf conf, McpRawMessage message) {
+    public String get(TemperatureDS18B20Conf conf, McpRawMessage message) throws ResourceNotAvailableException {
         switch (MESSAGE_TYPE_SET_REQ.valueOf(message.getSubType())) {
             case V_TEMP:
                 return getTemperature(conf);
@@ -44,12 +45,12 @@ public class TemperatureDS18B20 extends W1GenericDevice {
         }
     }
 
-    public String getTemperature(TemperatureDS18B20Conf conf) {
+    public String getTemperature(TemperatureDS18B20Conf conf) throws ResourceNotAvailableException {
         TemperatureSensor sensor = (TemperatureSensor) getDevice(conf, TmpDS18B20DeviceType.FAMILY_CODE);
         if (sensor != null) {
             return McUtils.getDoubleAsString(sensor.getTemperature(conf.getScale()));
         }
-        return null;
+        throw new ResourceNotAvailableException(conf.toString());
     }
 
     public String getId(TemperatureDS18B20Conf conf) {

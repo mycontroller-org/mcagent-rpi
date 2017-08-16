@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package org.mycontroller.agent.rpi.model;
 
 import java.util.Map;
 
+import org.mycontroller.agent.exceptions.ResourceNotAvailableException;
 import org.mycontroller.agent.rpi.AgentProperties;
 import org.mycontroller.agent.rpi.utils.AgentUtils;
 import org.mycontroller.agent.rpi.utils.AgentUtils.DEVICE_TYPE;
@@ -79,6 +80,7 @@ abstract class DeviceConf implements IDeviceConf {
         return message;
     }
 
+    @Override
     public McpRawMessage getMcpRawMessage(MESSAGE_TYPE_SET_REQ setReqType) {
         McpRawMessage message = getPayloadMessage();
         message.setSubType(setReqType.name());
@@ -96,7 +98,8 @@ abstract class DeviceConf implements IDeviceConf {
         return defaultValue;
     }
 
-    public void sendMeasurments() {
+    @Override
+    public void sendMeasurments() throws ResourceNotAvailableException {
         //Override on child classes
     }
 }
