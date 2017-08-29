@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,6 +30,7 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import com.pi4j.io.gpio.RaspiPinNumberingScheme;
+import com.pi4j.platform.Platform;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -62,6 +63,7 @@ public class AgentProperties {
     private List<Device> devices;
     private List<DeviceInternal> devicesInternal;
     private RaspiPinNumberingScheme pinNumberingScheme;
+    private Platform platform;
 
     public static AgentProperties getInstance() {
         return _instance;
@@ -100,6 +102,13 @@ public class AgentProperties {
                 .topicPublish(mqttTopicPublish)
                 .topicSubscribe(mqttTopicSubscribe.endsWith("/#") ? mqttTopicSubscribe : mqttTopicSubscribe + "/#")
                 .build();
+        try {
+            platform = Platform.valueOf(getValue(properties, "mcac.platform", "RASPBERRYPI").toUpperCase());
+        } catch (Exception ex) {
+            _logger.warn("Unknown platform! set to 'RASPBERRYPI'");
+            platform = Platform.RASPBERRYPI;
+        }
+
         try {
             pinNumberingScheme = RaspiPinNumberingScheme.valueOf(getValue(properties, "mcac.pin.numbering.scheme",
                     "DEFAULT_PIN_NUMBERING").toUpperCase());

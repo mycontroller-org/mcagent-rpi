@@ -16,7 +16,7 @@
  */
 package org.mycontroller.agent.rpi;
 
-import org.mycontroller.standalone.api.jaxrs.json.McAboutBase;
+import org.mycontroller.standalone.api.jaxrs.model.McAboutBase;
 
 import lombok.Getter;
 import lombok.ToString;

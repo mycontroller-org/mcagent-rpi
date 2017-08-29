@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,6 @@
  */
 package org.mycontroller.agent.rpi.devices.internal;
 
-import org.knowm.sundial.Job;
-import org.knowm.sundial.exceptions.JobInterruptException;
 import org.mycontroller.agent.rpi.mqtt.AgentRawMessageQueue;
 import org.mycontroller.standalone.api.jaxrs.utils.StatusBase;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE;
@@ -34,19 +32,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @NoArgsConstructor
-public class CpuUsage extends Job implements IDeviceInternal {
+public class CpuUsage extends InternalBase {
 
-    @Override
-    public void doRun() throws JobInterruptException {
-        try {
-            sendPayload();
-        } catch (Exception ex) {
-            _logger.error("Exception,", ex);
-        }
-
-    }
-
-    private void sendPayload() {
+    void sendPayload() {
         McpRawMessage message = getMcpRawMessage();
         message.setPayload(getUsage());
         AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
@@ -55,7 +43,7 @@ public class CpuUsage extends Job implements IDeviceInternal {
     private String getUsage() {
         try {
             return String.format("%.2f", StatusBase.operatingSystemMXBean.getSystemCpuLoad() * 100.0);
-        } catch (NumberFormatException | UnsupportedOperationException ex) {
+        } catch (NumberFormatException ex) {
             _logger.error("Exception, ", ex);
         }
         return null;

@@ -27,6 +27,9 @@ import org.mycontroller.agent.rpi.utils.AgentUtils;
 
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.RaspiGpioProvider;
+import com.pi4j.platform.Platform;
+import com.pi4j.platform.PlatformAlreadyAssignedException;
+import com.pi4j.platform.PlatformManager;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -91,8 +94,21 @@ public class StartAgent {
         //Add Shutdown hook
         new AgentShutdownHook().attachShutDownHook();
 
-        //Set default pin numbering scheme
-        GpioFactory.setDefaultProvider(new RaspiGpioProvider(AgentProperties.getInstance().getPinNumberingScheme()));
+        //Set platform and default pin numbering scheme
+        try {
+            Platform platform = AgentProperties.getInstance().getPlatform();
+            PlatformManager.setPlatform(platform);
+            if (platform == Platform.RASPBERRYPI) {
+                GpioFactory.setDefaultProvider(new RaspiGpioProvider(AgentProperties.getInstance()
+                        .getPinNumberingScheme()));
+            } else {
+                GpioFactory.setDefaultProvider(Platform.getGpioProvider(platform));
+            }
+            _logger.info("Platform:{}", PlatformManager.getPlatform());
+
+        } catch (PlatformAlreadyAssignedException ex) {
+            _logger.error("Excepton,", ex);
+        }
 
         //Start scheduler
         AgentSchedulerUtils.startScheduler();

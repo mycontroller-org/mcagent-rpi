@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,9 +18,7 @@ package org.mycontroller.agent.rpi.devices.internal;
 
 import java.io.IOException;
 
-import org.knowm.sundial.Job;
 import org.knowm.sundial.JobContext;
-import org.knowm.sundial.exceptions.JobInterruptException;
 import org.mycontroller.agent.rpi.model.DeviceInternal;
 import org.mycontroller.agent.rpi.mqtt.AgentRawMessageQueue;
 import org.mycontroller.agent.rpi.utils.AgentUtils;
@@ -39,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 0.0.1
  */
 @Slf4j
-public class SystemMemory extends Job implements IDeviceInternal {
+public class SystemMemory extends InternalBase {
     public static final String KEY_UNIT = "unit";
 
     public static final String USED = MESSAGE_TYPE_SET_REQ.V_USED.name();
@@ -48,20 +46,11 @@ public class SystemMemory extends Job implements IDeviceInternal {
 
     private Double divider = null;
 
-    @Override
-    public void doRun() throws JobInterruptException {
-        try {
-            JobContext context = getJobContext();
-            DeviceInternal device = (DeviceInternal) context.map.get(DeviceInternal.KEY_SELF);
-            divider = AgentUtils.getDividerForData(device.getProperties().get(KEY_UNIT)).doubleValue();
-            sendPayload();
-        } catch (Exception ex) {
-            _logger.error("Exception,", ex);
-        }
+    void sendPayload() {
+        JobContext context = getJobContext();
+        DeviceInternal device = (DeviceInternal) context.map.get(DeviceInternal.KEY_SELF);
+        divider = AgentUtils.getDividerForData(device.getProperties().get(KEY_UNIT)).doubleValue();
 
-    }
-
-    private void sendPayload() {
         //Send Used
         McpRawMessage message = getMcpRawMessage();
         message.setSubType(USED);
@@ -82,7 +71,7 @@ public class SystemMemory extends Job implements IDeviceInternal {
     private String getUsedPercentage() {
         try {
             return McUtils.getDoubleAsString((SystemInfo.getMemoryUsed() * 100.0) / SystemInfo.getMemoryTotal());
-        } catch (NumberFormatException | UnsupportedOperationException | IOException | InterruptedException ex) {
+        } catch (NumberFormatException | IOException | InterruptedException ex) {
             _logger.error("Exception, ", ex);
         }
         return null;
@@ -91,7 +80,7 @@ public class SystemMemory extends Job implements IDeviceInternal {
     private String getUsed() {
         try {
             return McUtils.getDoubleAsString(SystemInfo.getMemoryUsed() / divider);
-        } catch (NumberFormatException | UnsupportedOperationException | IOException | InterruptedException ex) {
+        } catch (NumberFormatException | IOException | InterruptedException ex) {
             _logger.error("Exception, ", ex);
         }
         return null;
@@ -100,7 +89,7 @@ public class SystemMemory extends Job implements IDeviceInternal {
     private String getFree() {
         try {
             return McUtils.getDoubleAsString(SystemInfo.getMemoryFree() / divider);
-        } catch (NumberFormatException | UnsupportedOperationException | IOException | InterruptedException ex) {
+        } catch (NumberFormatException | IOException | InterruptedException ex) {
             _logger.error("Exception, ", ex);
         }
         return null;

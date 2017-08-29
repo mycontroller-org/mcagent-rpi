@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,6 @@ package org.mycontroller.agent.rpi.devices.internal;
 
 import java.io.IOException;
 
-import org.knowm.sundial.Job;
-import org.knowm.sundial.exceptions.JobInterruptException;
 import org.mycontroller.agent.rpi.mqtt.AgentRawMessageQueue;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_PRESENTATION;
@@ -37,19 +35,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @NoArgsConstructor
-public class CpuTemperature extends Job implements IDeviceInternal {
+public class CpuTemperature extends InternalBase {
 
-    @Override
-    public void doRun() throws JobInterruptException {
-        try {
-            sendPayload();
-        } catch (Exception ex) {
-            _logger.error("Exception,", ex);
-        }
-
-    }
-
-    private void sendPayload() {
+    void sendPayload() {
         McpRawMessage message = getMcpRawMessage();
         message.setPayload(getTemperature());
         AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
@@ -58,7 +46,7 @@ public class CpuTemperature extends Job implements IDeviceInternal {
     private String getTemperature() {
         try {
             return String.valueOf(SystemInfo.getCpuTemperature());
-        } catch (NumberFormatException | UnsupportedOperationException | IOException | InterruptedException ex) {
+        } catch (NumberFormatException | IOException | InterruptedException ex) {
             _logger.error("Exception, ", ex);
         }
         return null;

@@ -127,6 +127,7 @@ public class AgentUtils {
 
     private static void loadGpioDevice() {
         for (Device device : AgentProperties.getInstance().getDevices()) {
+            _logger.debug("{}", device);
             DEVICE_TYPE type = DEVICE_TYPE.valueOf(device.getType().toUpperCase().replaceAll(" ", "_"));
             IDeviceConf deviceConf = null;
             if (device.getEnabled() == null || !device.getEnabled()) {
@@ -354,7 +355,7 @@ public class AgentUtils {
 
         //Send node lib version
         message.setMessageType(MESSAGE_TYPE.C_PRESENTATION);
-        message.setSubType(MESSAGE_TYPE_PRESENTATION.S_ARDUINO_REPEATER_NODE.name());
+        message.setSubType(MESSAGE_TYPE_PRESENTATION.S_ARDUINO_NODE.name());
         message.setPayload(about.getLibVersion());
         message.setNodeEui(AgentProperties.getInstance().getNodeNameInternal());
         AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());

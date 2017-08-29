@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,9 +39,10 @@ public class DigitalInputPinListener implements GpioPinListenerDigital {
 
     @Override
     public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent stateEvent) {
-        _logger.debug("Pin state:{}, ", stateEvent.getState().getValue(), conf);
+        _logger.debug("Pin state:{}, {}", stateEvent.getState().getValue(), conf);
         //Send to message queue
         McpRawMessage message = conf.getMcpRawMessage();
+        message.setPayload(String.valueOf(stateEvent.getState().getValue()));
         AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 

@@ -26,10 +26,17 @@ import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE;
 import org.mycontroller.standalone.message.McMessageUtils.MESSAGE_TYPE_SET_REQ;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
 
+import com.pi4j.io.gpio.BananaPiPin;
+import com.pi4j.io.gpio.BananaProPin;
+import com.pi4j.io.gpio.BpiPin;
+import com.pi4j.io.gpio.NanoPiPin;
+import com.pi4j.io.gpio.OdroidC1Pin;
+import com.pi4j.io.gpio.OrangePiPin;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiBcmPin;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.RaspiPinNumberingScheme;
+import com.pi4j.platform.PlatformManager;
 
 import lombok.Getter;
 import lombok.ToString;
@@ -57,11 +64,31 @@ abstract class DeviceConf implements IDeviceConf {
     }
 
     protected Pin getPinByName(String pinName) {
-        if (AgentProperties.getInstance().getPinNumberingScheme() == RaspiPinNumberingScheme.BROADCOM_PIN_NUMBERING) {
-            return RaspiBcmPin.getPinByName(pinName.toUpperCase());
-        } else {
-            return RaspiPin.getPinByName(pinName.toUpperCase());
+        pinName = pinName.toUpperCase();
+        switch (PlatformManager.getPlatform()) {
+            case BANANAPI:
+                return BananaPiPin.getPinByName(pinName);
+            case BANANAPRO:
+                return BananaProPin.getPinByName(pinName);
+            case BPI:
+                return BpiPin.getPinByName(pinName);
+            case ODROID:
+                return OdroidC1Pin.getPinByName(pinName);
+            case ORANGEPI:
+                return OrangePiPin.getPinByName(pinName);
+            case NANOPI:
+                return NanoPiPin.getPinByName(pinName);
+            case RASPBERRYPI:
+            default:
+                // if a platform cannot be determine, then assume it's the default RaspberryPi
+                if (AgentProperties.getInstance().getPinNumberingScheme()
+                == RaspiPinNumberingScheme.BROADCOM_PIN_NUMBERING) {
+                    return RaspiBcmPin.getPinByName(pinName);
+                } else {
+                    return RaspiPin.getPinByName(pinName);
+                }
         }
+
     }
 
     protected McpRawMessage getPresentationMessage() {

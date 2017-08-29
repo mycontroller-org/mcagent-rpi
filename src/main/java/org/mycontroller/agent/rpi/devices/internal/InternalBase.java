@@ -14,37 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.mycontroller.agent.rpi.jobs;
+package org.mycontroller.agent.rpi.devices.internal;
 
 import org.knowm.sundial.Job;
 import org.knowm.sundial.JobContext;
 import org.knowm.sundial.exceptions.JobInterruptException;
-import org.mycontroller.agent.rpi.model.IDeviceConf;
 import org.mycontroller.agent.rpi.utils.AgentSchedulerUtils;
-import org.mycontroller.agent.rpi.utils.AgentUtils;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Jeeva Kandasamy (jkandasa)
- * @since 0.0.1
+ * @since 1.0.0
  */
 @Slf4j
-public class SendMeasurments extends Job {
+@NoArgsConstructor
+public abstract class InternalBase extends Job implements IDeviceInternal {
 
     @Override
     public void doRun() throws JobInterruptException {
-        JobContext context = getJobContext();
-        IDeviceConf conf = (IDeviceConf) context.map.get(AgentUtils.KEY_GPIO_DEVICE_CONF);
         try {
-            conf.sendMeasurments();
-            _logger.debug("Measurment sent for {}", conf);
+            sendPayload();
         } catch (UnsupportedOperationException uex) {
-            _logger.error("Received UnsupportedOperationException. {}. Disabling this job: {}", conf, context, uex);
+            JobContext context = getJobContext();
+            _logger.error("Received UnsupportedOperationException. Disabling this job: {}", context.getJobName(), uex);
             AgentSchedulerUtils.removeJob(context.getJobName());
         } catch (Exception ex) {
-            _logger.error("Exception, {}", conf, ex);
+            _logger.error("Exception,", ex);
         }
+
     }
 
+    abstract void sendPayload();
 }
