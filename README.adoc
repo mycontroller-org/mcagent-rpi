@@ -1,10 +1,19 @@
-### MyController Raspberry PI agent
-McAgent to controller Raspberry PI GPIO pins. This agent is using http://pi4j.com/[PI4J] to control GPIO's.
+### MyController agent for embedded boards
+#### Supported embedded boards
+* Raspberry Pi
+* BananaPi
+* BananaPro
+* Synovoip BPI
+* Odroid
+* OrangePi
+* NanoPi
+
+McAgent to control GPIO pins of the embedded boards from remote via MyController server. This agent is using http://pi4j.com/[PI4J] to control GPIO's.
 
 [link=https://travis-ci.org/mycontroller-org/mcagent-rpi]
 Master: image:https://travis-ci.org/mycontroller-org/mcagent-rpi.svg?branch=master["Build Status", link="https://travis-ci.org/mycontroller-org/mcagent-rpi"]
 
-### How to setup this agent on Raspberry PI (RPI)?
+### How to setup this agent on embedded boards(example: Raspberry PI)?
 ##### Steps on MyController
 * You need to enable MQTT broker service on MyController server.
 
@@ -29,8 +38,9 @@ image::extra/images/rpi-internal-sensors.png[RPI internal sensors]
 #### MCagent properties:
 
 * File location: `conf/mcagent.properties`
+* Default `mcac.platform`: `RASPBERRYPI`. Supported options: `RASPBERRYPI`, `BANANAPI`, `BANANAPRO`, `BPI`, `ODROID`, `ORANGEPI` and `NANOPI`
 * Default `pin.numbering.scheme`: `DEFAULT_PIN_NUMBERING`. Supported options: `DEFAULT_PIN_NUMBERING`, `BROADCOM_PIN_NUMBERING `
-* To know more about `pin.numbering.scheme` http://pi4j.com/pin-numbering-scheme.html[click here]
+* To know more about `pin.numbering.scheme` http://pi4j.com/pin-numbering-scheme.html[click here] **NOTE:** Pin numbering option supports only on Raspberry Pi platform.
 * when you are running this agent on remote RPI, configure MQTT settings on this file,
 ```
 #========================================================================
@@ -58,7 +68,7 @@ Few examples,
 
 #### Input (switch, push button, etc)
 ```yaml
-- id: sample_digital_in_gpio_0
+- id: sample_digital_in
   name: Sample digital input switch
   type: DIGITAL_IN
   enabled: true
@@ -79,7 +89,7 @@ Few examples,
 
 #### Output (on/off switch)
 ```yaml
-- id: sample_digital_out_gpio_2
+- id: sample_digital_out
   name: Sample on/off relay control
   type: DIGITAL_OUT
   enabled: true
@@ -89,14 +99,15 @@ Few examples,
 
 #### PWM output
 ```yaml
-- id: sample_pwm_out_gpio_23
+- id: sample_pwm_out
   name: Sample PWM out
   type: PWM_OUT
   enabled: true
   properties:
     # All Raspberry Pi models support a hardware PWM pin on GPIO_01.
     # models A+, B+, 2B, 3B also support hardware PWM pins: GPIO_23, GPIO_24, GPIO_26
-    pin: gpio 1
+    # for other platforms(example: orange Pi), kindly refer their specifications.
+    pin: gpio 23
     range: 1024
     # supported modes: balanced, mark:space
     # for detail refer http://wiringpi.com/reference/raspberry-pi-specifics/
@@ -106,7 +117,7 @@ Few examples,
 
 #### Soft PWM
 ```yaml
-- id: sample_soft_pwm_out_gpio_3
+- id: sample_soft_pwm_out
   name: Sample Soft PWM out
   type: SOFT_PWM_OUT
   enabled: false
