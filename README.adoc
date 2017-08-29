@@ -2,6 +2,9 @@
 
 McAgent to control GPIO pins of the embedded boards via MyController server. This agent is using http://pi4j.com/[PI4J] to control GPIO's.
 
+[link=https://travis-ci.org/mycontroller-org/mcagent-rpi]
+Master: image:https://travis-ci.org/mycontroller-org/mcagent-rpi.svg?branch=master["Build Status", link="https://travis-ci.org/mycontroller-org/mcagent-rpi"]
+
 #### Supported embedded boards
 * Raspberry Pi
 * BananaPi
@@ -12,9 +15,6 @@ McAgent to control GPIO pins of the embedded boards via MyController server. Thi
 * NanoPi
 
 **IMPORTANT:** PI4J controls IO pins via WiringPi. For some platforms we may need to install specific **WiringPi** library on the system. In that case you can change `static` to `dynamic` on the option `PI4J_LINKING` in `mcagent/bin/start.sh`. Refer https://github.com/Pi4J/pi4j/issues/333[this issue] for more details.
-
-[link=https://travis-ci.org/mycontroller-org/mcagent-rpi]
-Master: image:https://travis-ci.org/mycontroller-org/mcagent-rpi.svg?branch=master["Build Status", link="https://travis-ci.org/mycontroller-org/mcagent-rpi"]
 
 ### How to setup this agent on embedded boards(example: Raspberry PI)?
 ##### Steps on MyController
