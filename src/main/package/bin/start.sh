@@ -28,6 +28,12 @@ cd ${ACTUAL_LOCATION}
 HEAP_MIN=-Xms4m
 HEAP_MAX=-Xmx4m
 
+#PI4J linking. Options: static, dynamic
+#static: native WiringPi bindings with inbuilt library
+#dynamic: Pi4J will bypass its embedded native WiringPi bindings and attempt to dynamically link to your WiringXXX .SO libraries installed on your system.
+PI4J_LINKING=static
+
+#Java version support. above this version
 JAVA_VERSION="1.7"
 
 #configuration file location
@@ -51,7 +57,7 @@ if [[ "$_java" ]]; then
         then
           echo "McAgent is already running on pid[${MC_PID}]"
         else
-          $_java ${HEAP_MIN} ${HEAP_MAX} -Dlogback.configurationFile=${CONF_LOG_FILE} -Dmca.conf.file=${CONF_PROPERTIES_FILE} -cp "../lib/*" org.mycontroller.agent.rpi.StartAgent >> ../logs/mcagent.log 2>&1 &
+          $_java ${HEAP_MIN} ${HEAP_MAX} -Dpi4j.linking=${PI4J_LINKING} -Dlogback.configurationFile=${CONF_LOG_FILE} -Dmca.conf.file=${CONF_PROPERTIES_FILE} -cp "../lib/*" org.mycontroller.agent.rpi.StartAgent >> ../logs/mcagent.log 2>&1 &
           echo 'Start service issued for McAgent'
         fi
     else
