@@ -5,6 +5,8 @@ McAgent to control GPIO pins of the embedded boards via MyController server. Thi
 [link=https://travis-ci.org/mycontroller-org/mcagent-rpi]
 Master: image:https://travis-ci.org/mycontroller-org/mcagent-rpi.svg?branch=master["Build Status", link="https://travis-ci.org/mycontroller-org/mcagent-rpi"]
 
+https://drive.google.com/drive/u/0/folders/0BzuumrtRA7p6OGM1UEdGY2RwUDA[**SNAPSHOT version**]
+
 #### Supported embedded boards
 * Raspberry Pi
 * BananaPi
