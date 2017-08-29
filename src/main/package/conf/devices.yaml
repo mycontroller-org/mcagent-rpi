@@ -1,5 +1,5 @@
 gpio_devices:
-- id: sample_digital_in_gpio_0
+- id: sample_digital_in
   name: Sample digital input switch
   type: DIGITAL_IN
   enabled: false
@@ -8,20 +8,21 @@ gpio_devices:
     pull_resistance: pull_up
     debounce_interval: 100
 
-- id: sample_digital_out_gpio_2
+- id: sample_digital_out
   name: Sample on/off relay control
   type: DIGITAL_OUT
   enabled: false
   properties:
     pin: gpio 2
 
-- id: sample_pwm_out_gpio_23
+- id: sample_pwm_out
   name: Sample PWM out
   type: PWM_OUT
   enabled: false
   properties:
     # All Raspberry Pi models support a hardware PWM pin on GPIO_01.
     # models A+, B+, 2B, 3B also support hardware PWM pins: GPIO_23, GPIO_24, GPIO_26
+    # for other platforms(example: orange Pi), kindly refer their specifications.
     pin: gpio 23
     range: 1024
     # supported modes: balanced, mark:space
@@ -29,7 +30,7 @@ gpio_devices:
     mode: balanced
     clock: 500
 
-- id: sample_soft_pwm_out_gpio_3
+- id: sample_soft_pwm_out
   name: Sample Soft PWM out
   type: SOFT_PWM_OUT
   enabled: false
