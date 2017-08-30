@@ -19,6 +19,7 @@ package org.mycontroller.agent.rpi.devices.internal;
 import org.knowm.sundial.Job;
 import org.knowm.sundial.JobContext;
 import org.knowm.sundial.exceptions.JobInterruptException;
+import org.mycontroller.agent.rpi.model.DeviceInternal;
 import org.mycontroller.agent.rpi.utils.AgentSchedulerUtils;
 
 import lombok.NoArgsConstructor;
@@ -32,12 +33,23 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 public abstract class InternalBase extends Job implements IDeviceInternal {
 
+    private DeviceInternal deviceInternal = null;
+
+    public DeviceInternal deviceConfiguration() {
+        return deviceInternal;
+    }
+
+    public void setDeviceConfiguration(DeviceInternal deviceInternal) {
+        this.deviceInternal = deviceInternal;
+    }
+
     @Override
     public void doRun() throws JobInterruptException {
+        JobContext context = getJobContext();
+        deviceInternal = (DeviceInternal) context.get(DeviceInternal.KEY_SELF);
         try {
             sendPayload();
         } catch (UnsupportedOperationException uex) {
-            JobContext context = getJobContext();
             _logger.error("Received UnsupportedOperationException. Disabling this job: {}", context.getJobName(), uex);
             AgentSchedulerUtils.removeJob(context.getJobName());
         } catch (Exception ex) {

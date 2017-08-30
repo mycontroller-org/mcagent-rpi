@@ -54,15 +54,15 @@ public class CpuVoltage extends InternalBase {
 
     @Override
     public void aboutMe() {
-        McpRawMessage message = DeviceIntUtils.getPresentationMessage(DeviceIntUtils.KEY_CPU_VOLTAGE);
+        McpRawMessage message = DeviceIntUtils.getPresentationMessage(deviceConfiguration().getId());
         message.setSubType(MESSAGE_TYPE_PRESENTATION.S_CPU.name());
-        message.setPayload(DeviceIntUtils.KEY_CPU_VOLTAGE_NAME);
+        message.setPayload(deviceConfiguration().getName());
         AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     @Override
     public McpRawMessage getMcpRawMessage() {
-        McpRawMessage message = DeviceIntUtils.getPayloadMessage(DeviceIntUtils.KEY_CPU_VOLTAGE);
+        McpRawMessage message = DeviceIntUtils.getPayloadMessage(deviceConfiguration().getId());
         message.setSubType(MESSAGE_TYPE_SET_REQ.V_VOLTAGE.name());
         return message;
     }

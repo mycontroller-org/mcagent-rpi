@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,8 @@ package org.mycontroller.agent.rpi.model;
 
 import java.util.Map;
 
+import org.mycontroller.agent.rpi.devices.internal.INTERNAL_TYPE;
+
 import lombok.Data;
 import lombok.ToString;
 
@@ -31,6 +33,8 @@ public class DeviceInternal {
     public static final String KEY_SELF = "deviceInternal";
     public static final String CRON_EXPRESSION = "cron";
     private String id;
+    private String name;
+    private INTERNAL_TYPE type;
     private Boolean enabled;
     private Map<String, String> properties;
 

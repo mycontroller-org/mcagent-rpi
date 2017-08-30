@@ -53,22 +53,30 @@ gpio_devices:
 
 internal_devices:
 - id: cpu_temperature
+  name: CPU temperature
+  type: CPU_TEMPERATURE
   enabled: true
   properties:
     cron: 0 0/2 * * * ?
 
 - id: cpu_voltage
+  name: CPU voltage
+  type: CPU_VOLTAGE
   enabled: true
   properties:
     cron: 0 0/10 * * * ?
 
 - id: memory_usage
+  name: Memory usage
+  type: MEMORY_USAGE
   enabled: true
   properties:
     cron: 0 0/5 * * * ?
     unit: MB
 
 - id: cpu_usage
+  name: CPU usage
+  type: CPU_USAGE
   enabled: true
   properties:
     cron: 0/30 * * * * ?

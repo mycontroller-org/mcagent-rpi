@@ -28,6 +28,7 @@ import org.mycontroller.agent.rpi.devices.SoftPWMOutput;
 import org.mycontroller.agent.rpi.devices.TemperatureDS18B20;
 import org.mycontroller.agent.rpi.devices.internal.DeviceIntUtils;
 import org.mycontroller.agent.rpi.devices.internal.IDeviceInternal;
+import org.mycontroller.agent.rpi.devices.internal.INTERNAL_TYPE;
 import org.mycontroller.agent.rpi.jobs.SendMeasurments;
 import org.mycontroller.agent.rpi.model.AgentTimer;
 import org.mycontroller.agent.rpi.model.Device;
@@ -105,22 +106,22 @@ public class AgentUtils {
                 _logger.debug("This device is in disabled state! {}", device);
                 continue;
             }
-            if (DeviceIntUtils.CLASSES_MAP.get(device.getId()) == null) {
-                _logger.warn("Please check the id! unknown internal device! {}", device);
+            if (device.getType() == null) {
+                _logger.warn("Please check the type! unknown internal device! {}", device);
                 continue;
             }
-            if (DeviceIntUtils.LOADED_DEVICES.get(device.getId()) != null) {
+            if (DeviceIntUtils.LOADED_DEVICES.get(device.getType().getText()) != null) {
                 _logger.warn("Found duplicate entry for {}", device);
                 continue;
             }
             AgentTimer timer = AgentTimer.builder()
                     .jobName(device.getId())
                     .cronExpression(device.getProperties().get(DeviceInternal.CRON_EXPRESSION))
-                    .targetClass(DeviceIntUtils.CLASSES_MAP.get(device.getId()))
+                    .targetClass(device.getType().getClassName())
                     .build();
             timer.getData().put(DeviceInternal.KEY_SELF, device);
             AgentSchedulerUtils.addJob(timer);
-            DeviceIntUtils.LOADED_DEVICES.put(device.getId(), device);
+            DeviceIntUtils.LOADED_DEVICES.put(device.getType().getText(), device);
             _logger.debug("This device loaded successfully, {}", device);
         }
     }
@@ -378,11 +379,12 @@ public class AgentUtils {
 
         //Send internal sensors details
         _logger.debug("Available intenal devices: {}", DeviceIntUtils.LOADED_DEVICES);
-        for (String deviceId : DeviceIntUtils.LOADED_DEVICES.keySet()) {
-            _logger.debug("Sending poresentation data for '{}'", deviceId);
+        for (String deviceTypeText : DeviceIntUtils.LOADED_DEVICES.keySet()) {
+            _logger.debug("Sending poresentation data for '{}'", deviceTypeText);
             try {
-                Class<?> clazz = Class.forName(DeviceIntUtils.CLASSES_MAP.get(deviceId));
+                Class<?> clazz = Class.forName(INTERNAL_TYPE.fromString(deviceTypeText).getClassName());
                 IDeviceInternal device = (IDeviceInternal) clazz.newInstance();
+                device.setDeviceConfiguration(DeviceIntUtils.LOADED_DEVICES.get(deviceTypeText));
                 device.aboutMe();
                 device.sendSensorVariables();
             } catch (InstantiationException | IllegalAccessException | ClassNotFoundException ex) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Jeeva Kandasamy (jkandasa@gmail.com)
+ * Copyright 2016-2017 Jeeva Kandasamy (jkandasa@gmail.com)
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
  */
 package org.mycontroller.agent.rpi.devices.internal;
 
+import org.mycontroller.agent.rpi.model.DeviceInternal;
 import org.mycontroller.standalone.provider.mc.McpRawMessage;
 
 /**
@@ -28,4 +29,8 @@ public interface IDeviceInternal {
     void sendSensorVariables();
 
     McpRawMessage getMcpRawMessage();
+
+    void setDeviceConfiguration(DeviceInternal deviceInternal);
+
+    DeviceInternal deviceConfiguration();
 }

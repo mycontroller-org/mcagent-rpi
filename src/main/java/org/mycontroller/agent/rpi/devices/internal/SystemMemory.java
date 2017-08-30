@@ -97,15 +97,15 @@ public class SystemMemory extends InternalBase {
 
     @Override
     public void aboutMe() {
-        McpRawMessage message = DeviceIntUtils.getPresentationMessage(DeviceIntUtils.KEY_MEMORY_USAGE);
+        McpRawMessage message = DeviceIntUtils.getPresentationMessage(deviceConfiguration().getId());
         message.setSubType(MESSAGE_TYPE_PRESENTATION.S_MEMORY.name());
-        message.setPayload(DeviceIntUtils.KEY_MEMORY_USAGE_NAME);
+        message.setPayload(deviceConfiguration().getName());
         AgentRawMessageQueue.getInstance().putMessage(message.getRawMessage());
     }
 
     @Override
     public McpRawMessage getMcpRawMessage() {
-        McpRawMessage message = DeviceIntUtils.getPayloadMessage(DeviceIntUtils.KEY_MEMORY_USAGE);
+        McpRawMessage message = DeviceIntUtils.getPayloadMessage(deviceConfiguration().getId());
         return message;
     }
 
